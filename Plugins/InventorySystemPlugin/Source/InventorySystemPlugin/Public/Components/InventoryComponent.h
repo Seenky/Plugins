@@ -70,8 +70,6 @@ protected:
 	/**Set amount of items and their tags that inventory can contain*/
 	UPROPERTY(Replicated, EditAnywhere, Category = "Settings")
 		TArray<FItemTypeData> ItemTypes;
-	UPROPERTY(Replicated, EditAnywhere, Category = "Settings")
-		FName ThirdPersonMeshTag;
 	/**List of start item, they are create and add on component init*/
 	UPROPERTY(Replicated, EditAnywhere, Category = "Settings|Start Items", meta=(DataTable="ItemsData"))
 		TArray<FCustomizedDataTableRowHandle> StartItems;

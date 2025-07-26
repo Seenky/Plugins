@@ -185,18 +185,22 @@ void UInventoryComponent::OnRep_AttachItem()
 	}
 	else
 	{
-		TArray<UActorComponent*> ThirdPersonMeshes = OwnerPawn->GetComponentsByTag(
-			USkeletalMeshComponent::StaticClass(), 
-			ThirdPersonMeshTag
-		);
-        
+		TArray<UActorComponent*> ThirdPersonMeshes  = OwnerPawn->K2_GetComponentsByClass(USkeletalMeshComponent::StaticClass());
+		
 		if (ThirdPersonMeshes.Num() > 0)
 		{
 			TargetMesh = Cast<USkeletalMeshComponent>(ThirdPersonMeshes[0]);
+			for (const auto ThirdPersonMesh : ThirdPersonMeshes)
+			{
+				if (ThirdPersonMesh->GetIsReplicated())
+				{
+					TargetMesh = Cast<USkeletalMeshComponent>(ThirdPersonMesh);
+				}
+			}
 		}
 		else
 		{
-			TargetMesh = Cast<USkeletalMeshComponent>(OwnerPawn->GetRootComponent());
+			TargetMesh = OwnerPawn->FindComponentByClass<USkeletalMeshComponent>();
 		}
 	}
 	
@@ -207,6 +211,8 @@ void UInventoryComponent::OnRep_AttachItem()
 			AttachItemRules, 
 			CurrentSocketName
 		);
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("ATTACH TO MESH %s, WITH SOCKET %s"), *GetNameSafe(TargetMesh), *CurrentSocketName.ToString()));
 
 		IInventoryInterface::Execute_SetAttachParent(CurrentSelectedItemActor, TargetMesh);
 	}
