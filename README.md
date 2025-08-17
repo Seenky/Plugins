@@ -27,7 +27,7 @@ InventorySystemPlugin – a multiplayer inventory system based on UObjects.
 
 * Items are represented as UObjects with instanced struct data, allowing any type of item.
 
- Actors containing these UObjects serve as item visualizations (pickup or usable versions).
+* Actors containing these UObjects serve as item visualizations (pickup or usable versions).
 
 * The usable version includes a Server_UseItem function, which triggers UseItemTagged and its multicast counterpart UseItemTaggedVisualization using gameplay tags to define logic.
 
