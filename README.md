@@ -1,23 +1,46 @@
-It's plugins that i can show, i have more, but they are under license.
+Here are some of the plugins I can showcase. I have more, but they are under license.
 
-Plugins :
-  HumansAndTraffic - advanced version of epic games mass crowd and mass traffic plugin. 
-    Added nigara crowd representation (Processors\MassCrowdNiagaraProcessor, Managers/NiagaraManager). 
-    Add humans color sync with packed custom data via particle color. 3 variations of colors pack in particle color at r, g, b and a channels.
-    Updated mass traffic intersections logic, now there can be more than one opened period in intersection. 
-    Updated Mass Traffic representation, no need to use phys actors, cars trace and calcualate positions and rotations from wheels. Traces simplify from visibility and distance.
-    Updated Traffic Visualization processor, packed custom data return car color, right vector of car and some more parameters, also fixed ISM representation didnt have rotation settings.
-    Add traffic obstacles, barriers and speed bumps.
-  AdvancedSessins - just small fix to standart sessions.
-  AdvancedVoiceChat - simple voice chat solution. Add and use.
-  InteractSystem - easy way yo interact with actors via interface.
-  InventorySystemPlugin - multiplayer inventory based on uobjects.
-    UObjects used as item representation with instanced struct data. so item can be anything.
-    Actors contaiting theese UObjects called item visualization. Can be usable of just pick up versions. 
-    Usable version has Server_UseItem function, this function calls UseItemTagged and UseItemTaggedVisualization(multicast version) with gameplay tag, which can be used to define logic.
-  PhysicInteractionPlugin - multiplayer interaction with phys actors.
-    It's advanced version of UPhysicsHandleComponent.
-    Takes mass and phys materials into account. You cant move heavier objects with lightweight objects.
-    Mass ratio settings from curve.
-  PropertyCustomizationPlugin - just add posibility to add struct categories, also add data table customization.
+Plugins:
+
+HumansAndTraffic – an advanced version of Epic Games’ Mass Crowd and Mass Traffic plugins.
+
+Added Niagara-based crowd representation (Processors/MassCrowdNiagaraProcessor, Managers/NiagaraManager).
+
+Human color synchronization via packed custom data in particle color. Three color variations are stored in R, G, B, and A channels.
+
+Improved Mass Traffic intersections logic: now multiple open periods are supported per intersection.
+
+Optimized Mass Traffic representation: no need for physics actors anymore. Cars calculate positions and rotations directly from wheel traces (simplified using visibility and distance checks).
+
+Enhanced Traffic Visualization processor: packed custom data now includes car color, right vector, and additional parameters. Fixed ISM representation issues (rotation support added).
+
+Introduced traffic obstacles such as barriers and speed bumps.
+
+AdvancedSessions – a small fix for the standard sessions system.
+
+AdvancedVoiceChat – a simple, ready-to-use voice chat solution.
+
+InteractSystem – an easy way to interact with actors via an interface.
+
+InventorySystemPlugin – a multiplayer inventory system based on UObjects.
+
+Items are represented as UObjects with instanced struct data, allowing any type of item.
+
+Actors containing these UObjects serve as item visualizations (pickup or usable versions).
+
+The usable version includes a Server_UseItem function, which triggers UseItemTagged and its multicast counterpart UseItemTaggedVisualization using gameplay tags to define logic.
+
+PhysicInteractionPlugin – multiplayer interaction with physics actors.
+
+An advanced version of UPhysicsHandleComponent.
+
+Takes into account mass and physical materials: lighter objects cannot move heavier ones.
+
+Mass ratio settings are customizable via curves.
+
+PropertyCustomizationPlugin – extends customization options:
+
+Adds support for struct categories.
+
+Adds data table customization.
     
