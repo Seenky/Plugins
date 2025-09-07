@@ -13,34 +13,35 @@ struct FUseSettings
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	/*Do we need to call an action*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action")
 		bool bNeedCallAction;
 	/*Enable or disable timer on use item*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bNeedCallAction"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bNeedCallAction", EditConditionHides), Category = "Timer")
 		bool bStartTimerOnUsing;
 	/*Delay on use timer*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bStartTimerOnUsing && bNeedCallAction"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bStartTimerOnUsing && bNeedCallAction", EditConditionHides), Category = "Timer")
 		float DelayOnUsing;
 	/*Use timer once and clear it*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bStartTimerOnUsing && bNeedCallAction"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bStartTimerOnUsing && bNeedCallAction", EditConditionHides), Category = "Timer")
 		bool bUseOnce;
 	/*Shoot instant use and then delayed one*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bStartTimerOnUsing && !bUseOnce && bNeedCallAction"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bStartTimerOnUsing && !bUseOnce && bNeedCallAction", EditConditionHides), Category = "Timer")
 		bool bInstantUseBeforeDelay;
 	/*Reset timer after canceled use*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bStartTimerOnUsing && bNeedCallAction"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bStartTimerOnUsing && bNeedCallAction", EditConditionHides), Category = "Timer")
 		bool bResetTimerOnCancelUse;
 	/*Reset timer after owner moves*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bStartTimerOnUsing && bNeedCallAction"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bStartTimerOnUsing && bNeedCallAction", EditConditionHides), Category = "Timer")
 		bool bResetTimerOnMovement;
 	/*Velocity threshold when check reset on movement*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bResetTimerOnMovement && bNeedCallAction"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bResetTimerOnMovement && bNeedCallAction && bStartTimerOnUsing", EditConditionHides), Category = "Timer")
 		float VelocityThreshold;
 	/*Set max velocity that item can used with (if 0 it will be used in any velocity)*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = 0, EditCondition = "bNeedCallAction"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = 0, EditCondition = "bNeedCallAction", EditConditionHides), Category = "Action")
 		float MaxVelocityToUse;
 	/*Call use item (false) or not*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bNeedCallAction"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bNeedCallAction", EditConditionHides), Category = "Action")
 		bool bCallCancelUse;
 
 	FUseSettings()
@@ -88,6 +89,7 @@ class INVENTORYSYSTEMPLUGIN_API AUsableItemActorBase : public AItemActorBase, pu
 public:
 	AUsableItemActorBase();
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		USkeletalMeshComponent* SkeletalMesh;
@@ -122,8 +124,8 @@ protected:
 	virtual void HandleUseItem(
 			const bool bUse,
 			TFunction<void(bool)> UseFunction,
-			FTimerHandle TimerHandle,
-			FTimerHandle CheckMovementHandle,
+			FTimerHandle& TimerHandle,
+			FTimerHandle& CheckMovementHandle,
 			FUseSettings UseSettings);
 	
 	/*Interact action tags, used to call any logic form child classes*/
@@ -135,7 +137,7 @@ protected:
 
 
 private:
-	void CheckMovement(const float VelocityThreshold, FTimerHandle TimerHandle, FTimerHandle CheckMovementHandle) const;
+	void CheckMovement(const float VelocityThreshold, FTimerHandle& TimerHandle, FTimerHandle& CheckMovementHandle) const;
 	FTimerHandle UseItemTimer;
 	FTimerHandle MulticastUseItemTimer;
 	FTimerHandle CheckMovementTimer;

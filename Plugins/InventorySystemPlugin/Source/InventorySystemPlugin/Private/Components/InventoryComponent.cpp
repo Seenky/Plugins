@@ -34,7 +34,7 @@ void UInventoryComponent::BeginPlay()
 	FirstInitComponent();
 }
 
-void UInventoryComponent::FirstInitComponent()
+void UInventoryComponent::FirstInitComponent_Implementation()
 {
 	if (!GetOwner()->HasAuthority()) return;
 	
@@ -64,7 +64,7 @@ void UInventoryComponent::FirstInitComponent()
 		FString::Printf(TEXT("INIT INVENTORY COMPONENT")));
 }
 
-void UInventoryComponent::InitStartItems()
+void UInventoryComponent::InitStartItems_Implementation()
 {
 	if (StartItems.IsEmpty() || !ItemsData) return;
 	for (const auto Item : StartItems)
@@ -130,7 +130,7 @@ void UInventoryComponent::Server_SelectItem_Implementation(const FGameplayTag It
 	if (CurrentSelectedItem ==  ItemToSelect) return;
 
 	//We need to ensure that last selected item was destroyed before select another one
-	if (CurrentSelectedItem && CurrentSelectedItemActor) CleanupCurrentItem();
+	if (CurrentSelectedItem && CurrentSelectedItemActor.Get()) CleanupCurrentItem();
 	
 	CurrentSelectedItem = ItemToSelect;
 	
@@ -152,10 +152,10 @@ void UInventoryComponent::Server_SelectItem_Implementation(const FGameplayTag It
 			return;
 		}
 
-		IInventoryInterface::Execute_EnableSimulatePhysics(CurrentSelectedItemActor, false);
+		IInventoryInterface::Execute_EnableSimulatePhysics(CurrentSelectedItemActor.Get(), false);
 
 		//Promote item data to selected actor
-		IInventoryInterface::Execute_SetInventoryItemObject(CurrentSelectedItemActor, CurrentSelectedItem);
+		IInventoryInterface::Execute_SetInventoryItemObject(CurrentSelectedItemActor.Get(), CurrentSelectedItem);
 
 		CurrentSelectedItemActor->FinishSpawning(SpawnTransform);
 
@@ -171,7 +171,7 @@ void UInventoryComponent::Server_SelectItem_Implementation(const FGameplayTag It
 
 void UInventoryComponent::OnRep_AttachItem()
 {
-	if (!CurrentSelectedItemActor || !GetOwner()) return;
+	if (!CurrentSelectedItemActor.IsValid() || !GetOwner()) return;
 
 	APawn* OwnerPawn = Cast<APawn>(GetOwner());
 	if (!OwnerPawn) return;
@@ -214,14 +214,14 @@ void UInventoryComponent::OnRep_AttachItem()
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("ATTACH TO MESH %s, WITH SOCKET %s"), *GetNameSafe(TargetMesh), *CurrentSocketName.ToString()));
 
-		IInventoryInterface::Execute_SetAttachParent(CurrentSelectedItemActor, TargetMesh);
+		IInventoryInterface::Execute_SetAttachParent(CurrentSelectedItemActor.Get(), TargetMesh);
 	}
 }
 
 //Try to drop selected item on ground
 void UInventoryComponent::Server_DropSelectedItem_Implementation()
 {
-	if (CurrentSelectedItemActor && CurrentSelectedItem)
+	if (CurrentSelectedItemActor.IsValid() && CurrentSelectedItem)
 	{
 		if (!GetItemTypeByTag(CurrentSelectedItem->GetItemTag()).bCanBeDropped ||
 			!CurrentSelectedItemActor->Implements<UInventoryInterface>()) return;
@@ -252,7 +252,7 @@ void UInventoryComponent::Server_DropSelectedItem_Implementation()
 				return;
 			}
 
-			CleanupOldItem(CurrentSelectedItem, CurrentSelectedItemActor);
+			CleanupOldItem(CurrentSelectedItem, CurrentSelectedItemActor.Get());
 
 			IInventoryInterface::Execute_EnableSimulatePhysics(DroppedItemActor, true);
 
@@ -265,7 +265,7 @@ void UInventoryComponent::Server_DropSelectedItem_Implementation()
 
 void UInventoryComponent::Server_DeselectSelectedItem_Implementation()
 {
-	if (CurrentSelectedItemActor && CurrentSelectedItem)
+	if (CurrentSelectedItemActor.IsValid() && CurrentSelectedItem)
 	{
 		CleanupCurrentItem();
 	}
@@ -362,8 +362,11 @@ bool UInventoryComponent::RemoveItem(UInventoryItem* Item)
 
 void UInventoryComponent::CleanupOldItem(UInventoryItem* Item, AActor* Owner)
 {
-	RemoveReplicatedSubObject(Item);
-	Item->ConditionalBeginDestroy();
+	if (Item)
+	{
+		RemoveReplicatedSubObject(Item);
+		Item->ConditionalBeginDestroy();
+	}
 	if (Owner) Owner->Destroy();
 	CurrentSocketName = NAME_None;
 }
@@ -381,7 +384,8 @@ UInventoryItem* UInventoryComponent::HandleNewItem(const UInventoryItem* Item, A
 
 void UInventoryComponent::CleanupCurrentItem()
 {
-	CurrentSelectedItemActor->Destroy();
+	if (CurrentSelectedItemActor.IsValid())
+		CurrentSelectedItemActor->Destroy();
 	CurrentSelectedItemActor = nullptr;
 	CurrentSelectedItem = nullptr;
 	CurrentSocketName = NAME_None;

@@ -18,7 +18,9 @@ public:
 	UInventoryComponent();
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
+	UFUNCTION(Server, Reliable)
 	virtual void FirstInitComponent();
+	UFUNCTION(Server, Reliable)
 	virtual void InitStartItems();
 	
 	//Delegates
@@ -46,7 +48,7 @@ public:
 	//Client
 	/**Get item actor that selected now*/
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Inventory")
-		AActor* GetCurrentSelectedItemActor() { return CurrentSelectedItemActor; }
+		AActor* GetCurrentSelectedItemActor() { return CurrentSelectedItemActor.Get(); }
 	/**Get item object that selected now*/
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Inventory")
 		UInventoryItem* GetCurrentSelectedItem() { return CurrentSelectedItem; }
@@ -56,7 +58,7 @@ public:
 
 	//Debug
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Debug")
-		FString GetCurrentSelectedItemActorName() const { return GetNameSafe(CurrentSelectedItemActor); }
+		FString GetCurrentSelectedItemActorName() const { return GetNameSafe(CurrentSelectedItemActor.Get()); }
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Debug")
 		FString GetCurrentSelectedItemName() const
 	{
@@ -82,7 +84,7 @@ protected:
 	UPROPERTY(Replicated)
 		TObjectPtr<UInventoryItem> CurrentSelectedItem;
 	UPROPERTY(ReplicatedUsing = OnRep_AttachItem)
-		TObjectPtr<AActor> CurrentSelectedItemActor;
+		TWeakObjectPtr<AActor> CurrentSelectedItemActor;
 	UPROPERTY(Replicated)
 		FName CurrentSocketName;
 
@@ -106,7 +108,7 @@ private:
 	FAttachmentTransformRules AttachItemRules = FAttachmentTransformRules(
 		EAttachmentRule::SnapToTarget,
 		EAttachmentRule::SnapToTarget,
-		EAttachmentRule::KeepWorld,
+		EAttachmentRule::KeepRelative,
 		false);
 
 	bool bIsInventoryLocked;
