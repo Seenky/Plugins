@@ -21,6 +21,7 @@ public:
 	virtual void OnInteractTargetFocusChanged_Implementation(bool bIsFindInteractTarget, FHitResult HitResult, AActor* QueryFromActor) override {}
 	virtual const TArray<UPrimitiveComponent*> GetComponentsForHighlight_Implementation() const override { return TArray<UPrimitiveComponent*>{Mesh}; }
 	virtual bool CanInteract_Implementation(FHitResult HitResult, AActor* QueryFromActor) override { return true; }
+	virtual void SetPickUpMesh_Implementation(UStaticMesh* StaticMesh) override { Mesh->SetStaticMesh(StaticMesh); }
 
 	virtual bool StartInteract_Implementation(FHitResult HitResult, AActor* QueryFromActor) override;
 

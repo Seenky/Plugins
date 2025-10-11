@@ -19,6 +19,8 @@ AItemActorBase::AItemActorBase()
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	Mesh->SetupAttachment(DefaultRoot);
 	Mesh->SetIsReplicated(true);
+
+	bAlwaysRelevant = true;
 }
 
 void AItemActorBase::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -60,6 +62,7 @@ void AItemActorBase::Server_EnableCollision_Implementation(const bool bEnable)
 	Mesh->SetEnableGravity(bEnable);
 	Mesh->SetSimulatePhysics(bEnable);
 	Mesh->SetCollisionEnabled(bEnable ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
+	Mesh->SetCollisionResponseToChannel(ECC_Pawn,ECR_Ignore);
 }
 
 void AItemActorBase::ClearEmptyComponents() const

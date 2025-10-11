@@ -17,7 +17,8 @@ bool APickupItemActorBase::StartInteract_Implementation(FHitResult HitResult, AA
 	// ReSharper disable once CppTooWideScopeInitStatement
 	UInventoryComponent* InventoryComp = QueryFromActor->FindComponentByClass<UInventoryComponent>();
 	if (!InventoryComp) return false;
-	
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "TRY PICKUP ACTOR");
 	InventoryComp->Server_AddItem(GetItemObject());
 	
 	return true;

@@ -8,6 +8,7 @@
 #include "StructUtils/InstancedStruct.h"
 #include "InventoryData.generated.h"
 
+class AFastenItemActor;
 class UInventoryItem;
 
 USTRUCT(BlueprintType)
@@ -46,15 +47,19 @@ public:
 
 	/*Pickup class for item, it needs to select what item class need to be dropped*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSoftClassPtr<AActor> ItemPickupClass;
+		TSubclassOf<AActor> ItemPickupClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TObjectPtr<UStaticMesh> LightweightMesh;
 
 	/*Use class for item, it needs to select what item class need to be selected*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSoftClassPtr<AActor> ItemUseClass;
+		TSubclassOf<AActor> ItemUseClass;
 
 	FInventoryItemData()
 		: ItemDescription(FInventoryItemDataDescription{})
 		, ItemPickupClass(nullptr)
+		, LightweightMesh(nullptr)
 		, ItemUseClass(nullptr)
 	{}
 };
@@ -77,6 +82,11 @@ public:
 	/*Socket name for items with selected tags should attach*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FName AttachSocketName;
+	/*Socket names for items with selected tags should attach when don't select (if none item won't attach)
+	 * Each socket linked to item index
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<FName> FastenSocketNames;
 
 	FItemTypeData()
 		: ItemTag(FGameplayTag::EmptyTag)
@@ -84,6 +94,46 @@ public:
 		, bCanBeDropped(true)
 	{}
 };
+
+USTRUCT(BlueprintType)
+struct FFastenItemsData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FGameplayTag ItemTag;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 ItemIndex;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		AFastenItemActor* FastenItemActor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bIsFasten;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName FastenSocketName;
+
+	bool operator==(const FFastenItemsData& Other) const
+	{
+		return Other.ItemTag == ItemTag && Other.ItemIndex == ItemIndex &&
+			   Other.FastenItemActor == FastenItemActor && Other.FastenSocketName == FastenSocketName;
+	}
+
+	FFastenItemsData()
+		: ItemIndex(0)
+		, FastenItemActor(nullptr)
+		, bIsFasten(false)
+	{
+	}
+
+	FFastenItemsData(const FGameplayTag& Tag, const int32& Index, AFastenItemActor* Actor, const FName& AttachSocket)
+		: ItemTag(Tag)
+		, ItemIndex(Index)
+		, FastenItemActor(Actor)
+		, bIsFasten(false)
+		, FastenSocketName(AttachSocket)
+	{
+	}
+};
+
 
 USTRUCT(BlueprintType)
 struct FPickupItemData

@@ -30,4 +30,6 @@ public:
 		void EnableSimulatePhysics(const bool bEnable);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		void SetAttachParent(USceneComponent* AttachParent);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		void SetPickUpMesh(UStaticMesh* Mesh);
 };
