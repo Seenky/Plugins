@@ -45,3 +45,10 @@ PropertyCustomizationPlugin – extends customization options:
 
 * Adds data table customization.
     
+FlowGear - new non replicated inventory/equipment system
+
+* FlowInventoryComponent store and manage items
+
+* FlowEquipmentComponent manage equipped items and interaction
+
+* FlowEquipmentActionComponent manage strategy action from equipment interaction
